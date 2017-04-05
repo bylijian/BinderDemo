@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-
+                download = null;
             }
         }, Context.BIND_AUTO_CREATE);
     }
