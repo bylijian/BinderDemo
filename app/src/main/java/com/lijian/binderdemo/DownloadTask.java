@@ -10,10 +10,12 @@ import android.os.Parcelable;
  */
 
 public class DownloadTask implements Parcelable {
+    public int taskId;
     public String fileName;
     public String downloadUrl;
 
-    public DownloadTask(String fileName, String downloadUrl) {
+    public DownloadTask(int taksId, String fileName, String downloadUrl) {
+        this.taskId = taksId;
         this.fileName = fileName;
         this.downloadUrl = downloadUrl;
     }
@@ -25,11 +27,13 @@ public class DownloadTask implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.taskId);
         dest.writeString(this.fileName);
         dest.writeString(this.downloadUrl);
     }
 
     protected DownloadTask(Parcel in) {
+        this.taskId = in.readInt();
         this.fileName = in.readString();
         this.downloadUrl = in.readString();
     }
@@ -45,4 +49,13 @@ public class DownloadTask implements Parcelable {
             return new DownloadTask[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "DownloadTask{" +
+                "taskId=" + taskId +
+                ", fileName='" + fileName + '\'' +
+                ", downloadUrl='" + downloadUrl + '\'' +
+                "}\n";
+    }
 }
