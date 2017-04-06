@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView getTasksInfo;
 
     private int index = 0;
+    private Button unRegisterBtn;
+    private OnTaskUpdateListener.Stub onTaskUpdateListner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +42,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setupView() {
         addTaskBtn = (Button) findViewById(R.id.btn_add_task);
         getTasksBtn = (Button) findViewById(R.id.btn_get_tasks);
+        unRegisterBtn = (Button) findViewById(R.id.btn_unregister_listener);
         addTaskInfo = (TextView) findViewById(R.id.tv_add_task_info);
         getTasksInfo = (TextView) findViewById(R.id.tv_tasks_info);
         addTaskBtn.setOnClickListener(this);
         getTasksBtn.setOnClickListener(this);
+        unRegisterBtn.setOnClickListener(this);
     }
 
     private void bindDownloadService() {
@@ -51,6 +56,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 download = IDownload.Stub.asInterface(service);
+                try {
+                    onTaskUpdateListner = new OnTaskUpdateListener.Stub() {
+                        @Override
+                        public void onTaskUpdate(DownloadTask task) throws RemoteException {
+                            if (task != null) {
+                                Toast toast = Toast.makeText(MainActivity.this, task.toString(), Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        }
+                    };
+                    download.registerUpdateListener(onTaskUpdateListner);
+                } catch (RemoteException e) {
+                    Log.w(TAG, e.toString());
+                }
+
             }
 
             @Override
@@ -70,8 +90,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_add_task:
                 addTask();
                 break;
+            case R.id.btn_unregister_listener:
+                unRegisterListener();
+                break;
             default:
                 break;
+        }
+    }
+
+    private void unRegisterListener() {
+        if (onTaskUpdateListner != null && download != null) {
+            try {
+                download.unRegisterUpdateListener(onTaskUpdateListner);
+                onTaskUpdateListner = null;
+            } catch (RemoteException e) {
+                Log.w(TAG, e);
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package com.lijian.binderdemo;
 
+import android.os.RemoteException;
+
 public interface IDownload extends android.os.IInterface {
     /**
      * Local-side IPC implementation stub class.
@@ -60,6 +62,22 @@ public interface IDownload extends android.os.IInterface {
                     reply.writeNoException();
                     return true;
                 }
+                case TRANSACTION_registerUpdateListener: {
+                    data.enforceInterface(DESCRIPTOR);
+                    com.lijian.binderdemo.OnTaskUpdateListener _arg0;
+                    _arg0 = com.lijian.binderdemo.OnTaskUpdateListener.Stub.asInterface(data.readStrongBinder());
+                    this.registerUpdateListener(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
+                case TRANSACTION_unRegisterUpdateListener: {
+                    data.enforceInterface(DESCRIPTOR);
+                    com.lijian.binderdemo.OnTaskUpdateListener _arg0;
+                    _arg0 = com.lijian.binderdemo.OnTaskUpdateListener.Stub.asInterface(data.readStrongBinder());
+                    this.unRegisterUpdateListener(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
             }
             return super.onTransact(code, data, reply, flags);
         }
@@ -116,13 +134,49 @@ public interface IDownload extends android.os.IInterface {
                     _data.recycle();
                 }
             }
+
+            @Override
+            public void registerUpdateListener(OnTaskUpdateListener listener) throws RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeStrongBinder((((listener != null)) ? (listener.asBinder()) : (null)));
+                    mRemote.transact(Stub.TRANSACTION_registerUpdateListener, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
+
+            @Override
+            public void unRegisterUpdateListener(OnTaskUpdateListener listener) throws RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeStrongBinder((((listener != null)) ? (listener.asBinder()) : (null)));
+                    mRemote.transact(Stub.TRANSACTION_unRegisterUpdateListener, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
         }
 
         static final int TRANSACTION_getTasks = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
         static final int TRANSACTION_addTask = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
+        static final int TRANSACTION_registerUpdateListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
+        static final int TRANSACTION_unRegisterUpdateListener = (android.os.IBinder.FIRST_CALL_TRANSACTION + 3);
     }
 
     java.util.List<DownloadTask> getTasks() throws android.os.RemoteException;
 
     void addTask(DownloadTask task) throws android.os.RemoteException;
+
+    void registerUpdateListener(OnTaskUpdateListener listener) throws android.os.RemoteException;
+
+    void unRegisterUpdateListener(OnTaskUpdateListener listener) throws android.os.RemoteException;
 }
